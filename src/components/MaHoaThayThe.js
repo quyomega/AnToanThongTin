@@ -19,7 +19,6 @@ function MaHoaThayThe() {
       .join('');
   };
 
-  // Hàm giải mã
   const reverseSubstitutionCipher = (text, substitutionAlphabet) => {
     return text
       .toUpperCase()

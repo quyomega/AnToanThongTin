@@ -6,7 +6,6 @@ function MaHoaVigenere() {
   const [keyword, setKeyword] = useState('');
   const [outputText, setOutputText] = useState('');
 
-  // Hàm mã hóa Vigenère
   const vigenereEncrypt = (text, keyword) => {
     let encryptedText = '';
     keyword = keyword.toLowerCase();
@@ -19,16 +18,15 @@ function MaHoaVigenere() {
         const base = char.charCodeAt(0) < 97 ? 65 : 97;
         const shift = keyword.charCodeAt(keywordIndex % keyword.length) - 97;
         encryptedText += String.fromCharCode(((char.charCodeAt(0) - base + shift) % 26) + base);
-        keywordIndex++; // Chỉ tăng keywordIndex khi mã hóa ký tự là chữ cái
+        keywordIndex++;
       } else {
-        encryptedText += char; // Giữ nguyên các ký tự không phải chữ cái
+        encryptedText += char; 
       }
     }
 
     return encryptedText;
   };
 
-  // Hàm giải mã Vigenère
   const vigenereDecrypt = (text, keyword) => {
     let decryptedText = '';
     keyword = keyword.toLowerCase();
@@ -41,9 +39,9 @@ function MaHoaVigenere() {
         const base = char.charCodeAt(0) < 97 ? 65 : 97;
         const shift = keyword.charCodeAt(keywordIndex % keyword.length) - 97;
         decryptedText += String.fromCharCode(((char.charCodeAt(0) - base - shift + 26) % 26) + base);
-        keywordIndex++; // Chỉ tăng keywordIndex khi mã hóa ký tự là chữ cái
+        keywordIndex++; 
       } else {
-        decryptedText += char; // Giữ nguyên các ký tự không phải chữ cái
+        decryptedText += char; 
       }
     }
 
