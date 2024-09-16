@@ -3,22 +3,19 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 function MaHoaHoanVi() {
   const [inputText, setInputText] = useState('');
-  const [numColumns, setNumColumns] = useState(4); // Số cột mặc định là 4
+  const [numColumns, setNumColumns] = useState(4); 
   const [outputText, setOutputText] = useState('');
 
-  // Hàm mã hóa hoán vị
   const hoanViEncrypt = (text, numColumns) => {
     const rows = Math.ceil(text.length / numColumns);
     let grid = Array.from({ length: rows }, () => new Array(numColumns).fill(''));
     
-    // Chia văn bản vào lưới theo hàng
     for (let i = 0; i < text.length; i++) {
       const row = Math.floor(i / numColumns);
       const col = i % numColumns;
       grid[row][col] = text[i];
     }
 
-    // Đọc văn bản từ lưới theo cột
     let encryptedText = '';
     for (let col = 0; col < numColumns; col++) {
       for (let row = 0; row < rows; row++) {
@@ -31,14 +28,12 @@ function MaHoaHoanVi() {
     return encryptedText;
   };
 
-  // Hàm giải mã hoán vị
   const hoanViDecrypt = (text, numColumns) => {
     const rows = Math.ceil(text.length / numColumns);
     let grid = Array.from({ length: rows }, () => new Array(numColumns).fill(''));
     
     let index = 0;
 
-    // Điền văn bản mã hóa vào lưới theo cột
     for (let col = 0; col < numColumns; col++) {
       for (let row = 0; row < rows; row++) {
         if (index < text.length) {
@@ -48,7 +43,6 @@ function MaHoaHoanVi() {
       }
     }
 
-    // Đọc văn bản từ lưới theo hàng
     let decryptedText = '';
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < numColumns; col++) {
@@ -94,7 +88,7 @@ function MaHoaHoanVi() {
               value={numColumns}
               onChange={(e) => setNumColumns(e.target.value)}
               className="form-control"
-              min={2} // Đảm bảo ít nhất phải có 2 cột
+              min={2} 
             />
           </div>
 

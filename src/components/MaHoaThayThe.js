@@ -42,7 +42,7 @@ function MaHoaThayThe() {
 
   return (
     <div className="container mt-5 p-4 shadow rounded bg-light">
-      <h2 className="text-center mb-4">Mã Hóa Thay Thế Đơn Bản</h2>
+      <h2 className="text-center mb-4">Mã Hóa Thay Thế</h2>
       <div className="row">
         <div className="col-md-6">
           <div className="mb-3">
