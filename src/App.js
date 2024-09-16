@@ -4,6 +4,7 @@ import MaHoaCaesar from './components/MaHoaCaesar';
 import MaHoaThayThe from './components/MaHoaThayThe';
 import MaHoaHoanVi from './components/MaHoaHoanVi';
 import MaHoaVigenere from './components/MaHoaVigenere';
+import MaHoaAffine from './components/MaHoaAffine';  
 
 function App() {
   return (
@@ -14,7 +15,8 @@ function App() {
           <Link to="/mahoacaesar" className="btn btn-primary me-2">Bài 1: Mã Hóa Caesar</Link>
           <Link to="/mahoathaythe" className="btn btn-primary me-2">Bài 2: Mã Hóa Thay Thế</Link>
           <Link to="/mahoahoanvi" className="btn btn-primary me-2">Bài 3: Mã Hóa Hoán Vị</Link>
-          <Link to="/mahoavigenere" className="btn btn-primary">Bài 4: Mã Hóa Vigenere</Link>
+          <Link to="/mahoavigenere" className="btn btn-primary me-2">Bài 4: Mã Hóa Vigenere</Link>
+          <Link to="/mahoaaffine" className="btn btn-primary">Bài 5: Mã Hóa Affine</Link>
         </nav>
 
         <Routes>
@@ -22,6 +24,7 @@ function App() {
           <Route path="/mahoathaythe" element={<MaHoaThayThe />} />
           <Route path="/mahoahoanvi" element={<MaHoaHoanVi />} />
           <Route path="/mahoavigenere" element={<MaHoaVigenere />} />
+          <Route path="/mahoaaffine" element={<MaHoaAffine />} />
         </Routes>
       </div>
     </Router>
