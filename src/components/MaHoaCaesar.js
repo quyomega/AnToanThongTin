@@ -3,12 +3,12 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 function MaHoaCaesar() {
   const [inputText, setInputText] = useState('');
-  const [shift, setShift] = useState(0);
+  const [k, setk] = useState(0);
   const [outputText, setOutputText] = useState('');
 
-  const caesarCipher = (text, shift, decode = false) => {
+  const caesar = (text, k, decode = false) => {
     if (decode) {
-      shift = (26 - shift) % 26;
+      k = (26 - k) % 26;
     }
 
     return text
@@ -16,20 +16,20 @@ function MaHoaCaesar() {
       .map((char) => {
         if (/[a-zA-Z]/.test(char)) {
           const base = char.charCodeAt(0) < 97 ? 65 : 97;
-          return String.fromCharCode(((char.charCodeAt(0) - base + shift) % 26) + base);
+          return String.fromCharCode(((char.charCodeAt(0) - base + k) % 26) + base);
         }
         return char;
       })
       .join('');
   };
 
-  const handleEncrypt = () => {
-    const result = caesarCipher(inputText, parseInt(shift));
+  const maHoa = () => {
+    const result = caesar(inputText, parseInt(k));
     setOutputText(result);
   };
 
-  const handleDecrypt = () => {
-    const result = caesarCipher(inputText, parseInt(shift), true);
+  const giaiMa = () => {
+    const result = caesar(inputText, parseInt(k), true);
     setOutputText(result);
   };
 
@@ -43,7 +43,7 @@ function MaHoaCaesar() {
             <label>Nhập bản rõ:</label>
             <input
               type="text"
-              value={inputText}
+              value={inputText} 
               onChange={(e) => setInputText(e.target.value)}
               className="form-control"
             />
@@ -53,17 +53,17 @@ function MaHoaCaesar() {
             <label>Nhập giá trị khóa k :</label>
             <input
               type="number"
-              value={shift}
-              onChange={(e) => setShift(e.target.value)}
+              value={k}
+              onChange={(e) => setk(e.target.value)}
               className="form-control"
             />
           </div>
 
           <div className="text-center mb-4">
-            <button onClick={handleEncrypt} className="btn btn-primary me-2">
+            <button onClick={maHoa} className="btn btn-primary me-2">
               Mã Hóa
             </button>
-            <button onClick={handleDecrypt} className="btn btn-secondary">
+            <button onClick={giaiMa} className="btn btn-secondary">
               Giải Mã
             </button>
           </div>
