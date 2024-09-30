@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import React, { useState } from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 function MaHoaAffine() {
-  const [inputText, setInputText] = useState('');
-  const [a, setA] = useState('');
-  const [b, setB] = useState('');
-  const [outputText, setOutputText] = useState('');
+  const [inputText, setInputText] = useState("");
+  const [a, setA] = useState("");
+  const [b, setB] = useState("");
+  const [outputText, setOutputText] = useState("");
 
   const affineEncrypt = (text, a, b) => {
-    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     const m = alphabet.length;
     const gcd = (x, y) => {
       while (y !== 0) {
@@ -23,7 +23,7 @@ function MaHoaAffine() {
       return "a và b phải là 2 số nguyên tố cùng nhau";
     }
 
-    let encryptedText = '';
+    let encryptedText = "";
 
     for (let char of text.toUpperCase()) {
       if (alphabet.includes(char)) {
@@ -31,7 +31,7 @@ function MaHoaAffine() {
         const encryptedCharIndex = (a * x + b) % m;
         encryptedText += alphabet[encryptedCharIndex];
       } else {
-        encryptedText += char; 
+        encryptedText += char;
       }
     }
 
@@ -39,7 +39,7 @@ function MaHoaAffine() {
   };
 
   const affineDecrypt = (text, a, b) => {
-    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     const m = alphabet.length;
 
     const modInverse = (a, m) => {
@@ -54,7 +54,7 @@ function MaHoaAffine() {
     };
 
     const aInv = modInverse(a, m);
-    let decryptedText = '';
+    let decryptedText = "";
 
     for (let char of text.toUpperCase()) {
       if (alphabet.includes(char)) {
@@ -96,22 +96,26 @@ function MaHoaAffine() {
           </div>
 
           <div className="mb-3">
-          <label>Nhập từ khóa:</label>
+            <label>Nhập khóa:</label>
             <div className="row">
               <div className="col-md-6 d-flex align-items-center">
-                <label htmlFor="a" className="me-2">a:</label>
+                <label htmlFor="a" className="me-2">
+                  a:
+                </label>
                 <input
                   id="a"
                   type="number"
                   value={a}
                   onChange={(e) => setA(parseInt(e.target.value, 10))}
                   className="form-control"
-                  style={{ width: 'auto' }}
+                  style={{ width: "auto" }}
                 />
               </div>
 
               <div className="col-md-6 d-flex align-items-center">
-                <label htmlFor="b" className="me-2">b:</label>
+                <label htmlFor="b" className="me-2">
+                  b:
+                </label>
                 <input
                   id="b"
                   type="number"

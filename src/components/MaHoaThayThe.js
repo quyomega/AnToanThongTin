@@ -5,8 +5,14 @@ function MaHoaThayThe() {
   const [inputText, setInputText] = useState('');
   const [substitutionAlphabet, setSubstitutionAlphabet] = useState('QWERTYUIOPASDFGHJKLZXCVBNM');
   const [outputText, setOutputText] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+  const isValidSubstitutionAlphabet = (substitutionAlphabet) => {
+    const uniqueChars = new Set(substitutionAlphabet);
+    return uniqueChars.size === 26; 
+  };
 
   const substitutionCipher = (text, substitutionAlphabet) => {
     return text
@@ -31,13 +37,23 @@ function MaHoaThayThe() {
   };
 
   const handleEncrypt = () => {
-    const result = substitutionCipher(inputText, substitutionAlphabet);
-    setOutputText(result);
+    if (isValidSubstitutionAlphabet(substitutionAlphabet)) {
+      const result = substitutionCipher(inputText, substitutionAlphabet);
+      setOutputText(result);
+      setErrorMessage('');
+    } else {
+      setErrorMessage('Bảng chữ cái thay thế không hợp lệ! Hãy đảm bảo đủ 26 ký tự và không có ký tự trùng.');
+    }
   };
 
   const handleDecrypt = () => {
-    const result = reverseSubstitutionCipher(inputText, substitutionAlphabet);
-    setOutputText(result);
+    if (isValidSubstitutionAlphabet(substitutionAlphabet)) {
+      const result = reverseSubstitutionCipher(inputText, substitutionAlphabet);
+      setOutputText(result);
+      setErrorMessage('');
+    } else {
+      setErrorMessage('Bảng chữ cái thay thế không hợp lệ! Hãy đảm bảo đủ 26 ký tự và không có ký tự trùng.');
+    }
   };
 
   return (
@@ -63,9 +79,15 @@ function MaHoaThayThe() {
               value={substitutionAlphabet}
               onChange={(e) => setSubstitutionAlphabet(e.target.value.toUpperCase())}
               className="form-control"
-              maxLength={26} 
+              maxLength={26}
             />
           </div>
+
+          {errorMessage && (
+            <div className="alert alert-danger">
+              {errorMessage}
+            </div>
+          )}
 
           <div className="text-center mb-4">
             <button onClick={handleEncrypt} className="btn btn-primary me-2">
