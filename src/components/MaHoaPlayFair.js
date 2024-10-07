@@ -5,13 +5,14 @@ function MaHoaPlayfair() {
   const [inputText, setInputText] = useState("");
   const [key, setKey] = useState("");
   const [outputText, setOutputText] = useState("");
+  const [keySquareDisplay, setKeySquareDisplay] = useState([]);
 
+  //Hàm mã hóa
   const playfairEncrypt = (text, key) => {
     const alphabet = "ABCDEFGHIKLMNOPQRSTUVWXYZ";
     const keySquare = generateKeySquare(key, alphabet);
-
+    setKeySquareDisplay(keySquare); // Lưu ma trận để hiển thị
     const formattedText = formatText(text);
-
     let encryptedText = "";
     for (let i = 0; i < formattedText.length; i += 2) {
       const pair = formattedText.slice(i, i + 2);
@@ -22,9 +23,11 @@ function MaHoaPlayfair() {
     return encryptedText;
   };
 
+  //Hàm giải mã
   const playfairDecrypt = (text, key) => {
     const alphabet = "ABCDEFGHIKLMNOPQRSTUVWXYZ";
     const keySquare = generateKeySquare(key, alphabet);
+    setKeySquareDisplay(keySquare); // Lưu ma trận để hiển thị
     let decryptedText = "";
 
     for (let i = 0; i < text.length; i += 2) {
@@ -36,6 +39,7 @@ function MaHoaPlayfair() {
     return decryptedText;
   };
 
+  //Hàm tạo ma trận khóa
   const generateKeySquare = (key, alphabet) => {
     const uniqueKey = Array.from(new Set(key.toUpperCase().replace(/J/g, "I")));
     let keySquare = [...uniqueKey];
@@ -46,9 +50,10 @@ function MaHoaPlayfair() {
       }
     }
 
-    return keySquare; 
+    return keySquare;
   };
 
+  //Xử lý bản rõ
   const formatText = (text) => {
     let formattedText = text
       .toUpperCase()
@@ -62,7 +67,7 @@ function MaHoaPlayfair() {
 
       if (second === first) {
         result += first + "X";
-        i--; 
+        i--;
       } else if (!second) {
         result += first + "X";
       } else {
@@ -72,6 +77,8 @@ function MaHoaPlayfair() {
 
     return result;
   };
+
+  //Mã hóa từng cặp
   const encryptPair = (pair, keySquare) => {
     const size = 5;
     const [row1, col1] = findPosition(pair[0], keySquare, size);
@@ -94,6 +101,7 @@ function MaHoaPlayfair() {
     return encryptedPair;
   };
 
+  //Giải mã từng cặp
   const decryptPair = (pair, keySquare) => {
     const size = 5;
     const [row1, col1] = findPosition(pair[0], keySquare, size);
@@ -123,13 +131,13 @@ function MaHoaPlayfair() {
 
   const handleKeyChange = (e) => {
     const input = e.target.value;
-    const filteredInput = input.replace(/[^a-zA-Z]/g, ""); 
+    const filteredInput = input.replace(/[^a-zA-Z]/g, "");
     setKey(filteredInput);
   };
 
   const handleInputTextChange = (e) => {
     const input = e.target.value;
-    const filteredInput = input.replace(/[^a-zA-Z]/g, ""); 
+    const filteredInput = input.replace(/[^a-zA-Z]/g, "");
     setInputText(filteredInput);
   };
 
@@ -164,7 +172,7 @@ function MaHoaPlayfair() {
             <input
               type="text"
               value={key}
-              onChange={handleKeyChange} 
+              onChange={handleKeyChange}
               className="form-control"
             />
           </div>
@@ -176,6 +184,25 @@ function MaHoaPlayfair() {
             <button onClick={handleDecrypt} className="btn btn-secondary">
               Giải Mã
             </button>
+          </div>
+
+          <h3>Ma Trận Khóa:</h3>
+          <div className="key-square">
+            {keySquareDisplay.length > 0 && (
+              <table className="table table-bordered">
+                <tbody>
+                  {[...Array(5)].map((_, rowIndex) => (
+                    <tr key={rowIndex}>
+                      {[...Array(5)].map((_, colIndex) => (
+                        <td key={colIndex}>
+                          {keySquareDisplay[rowIndex * 5 + colIndex]}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         </div>
 
