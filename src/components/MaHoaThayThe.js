@@ -3,42 +3,42 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 function MaHoaThayThe() {
   const [inputText, setInputText] = useState('');
-  const [substitutionAlphabet, setSubstitutionAlphabet] = useState('QWERTYUIOPASDFGHJKLZXCVBNM');
+  const [Khoa, setKhoa] = useState('QWERTYUIOPASDFGHJKLZXCVBNM');
   const [outputText, setOutputText] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
-  const isValidSubstitutionAlphabet = (substitutionAlphabet) => {
-    const uniqueChars = new Set(substitutionAlphabet);
+  const isKiemTraKhoa = (Khoa) => {
+    const uniqueChars = new Set(Khoa);
     return uniqueChars.size === 26; 
   };
 
-  const substitutionCipher = (text, substitutionAlphabet) => {
+  const maHoa = (text, Khoa) => {
     return text
       .toUpperCase()
       .split('')
       .map((char) => {
         const index = alphabet.indexOf(char);
-        return index !== -1 ? substitutionAlphabet[index] : char;
+        return index !== -1 ? Khoa[index] : char;
       })
       .join('');
   };
 
-  const reverseSubstitutionCipher = (text, substitutionAlphabet) => {
+  const giaiMa = (text, Khoa) => {
     return text
       .toUpperCase()
       .split('')
       .map((char) => {
-        const index = substitutionAlphabet.indexOf(char);
+        const index = Khoa.indexOf(char);
         return index !== -1 ? alphabet[index] : char;
       })
       .join('');
   };
 
   const handleEncrypt = () => {
-    if (isValidSubstitutionAlphabet(substitutionAlphabet)) {
-      const result = substitutionCipher(inputText, substitutionAlphabet);
+    if (isKiemTraKhoa(Khoa)) {
+      const result = maHoa(inputText, Khoa);
       setOutputText(result);
       setErrorMessage('');
     } else {
@@ -47,8 +47,8 @@ function MaHoaThayThe() {
   };
 
   const handleDecrypt = () => {
-    if (isValidSubstitutionAlphabet(substitutionAlphabet)) {
-      const result = reverseSubstitutionCipher(inputText, substitutionAlphabet);
+    if (isKiemTraKhoa(Khoa)) {
+      const result = giaiMa(inputText, Khoa);
       setOutputText(result);
       setErrorMessage('');
     } else {
@@ -76,8 +76,8 @@ function MaHoaThayThe() {
             <label>Nhập bảng chữ cái thay thế (26 ký tự):</label>
             <input
               type="text"
-              value={substitutionAlphabet}
-              onChange={(e) => setSubstitutionAlphabet(e.target.value.toUpperCase())}
+              value={Khoa}
+              onChange={(e) => setKhoa(e.target.value.toUpperCase())}
               className="form-control"
               maxLength={26}
             />
