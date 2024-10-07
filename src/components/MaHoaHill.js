@@ -1,11 +1,41 @@
 import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 
+const modInverseMatrix = (matrix, mod) => {
+  const det = matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0];
+  const invDet = modInverse(det, mod); 
+  if (invDet === null) return null; 
+
+  const inverseMatrix = [
+    [matrix[1][1] * invDet % mod, -matrix[0][1] * invDet % mod],
+    [-matrix[1][0] * invDet % mod, matrix[0][0] * invDet % mod],
+  ];
+
+  for (let i = 0; i < 2; i++) {
+    for (let j = 0; j < 2; j++) {
+      if (inverseMatrix[i][j] < 0) inverseMatrix[i][j] += mod;
+    }
+  }
+
+  return inverseMatrix;
+};
+
+const modInverse = (a, mod) => {
+  a = ((a % mod) + mod) % mod;
+  for (let x = 1; x < mod; x++) {
+    if ((a * x) % mod === 1) {
+      return x;
+    }
+  }
+  return null;
+};
+
 function MaHoaHill() {
   const [inputText, setInputText] = useState("");
   const [matrixSize, setMatrixSize] = useState(2); 
   const [keyMatrix, setKeyMatrix] = useState([[11, 8], [3, 7]]); 
   const [outputText, setOutputText] = useState("");
+  const [error, setError] = useState("");  // Thêm state để lưu lỗi
 
   const handleMatrixChange = (row, col, value) => {
     const updatedMatrix = [...keyMatrix];
@@ -23,40 +53,99 @@ function MaHoaHill() {
     setKeyMatrix(generateEmptyMatrix(size)); 
   };
 
+  // Hàm kiểm tra đầu vào: chỉ cho phép các ký tự chữ cái không dấu
+  const validateInput = (text) => {
+    const regex = /^[A-Za-z]+$/;
+    return regex.test(text);
+  };
+
   const hillEncrypt = (text, matrix) => {
     const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     const m = alphabet.length;
-    const n = matrix.length; 
+    const n = matrix.length;
 
     const charToNum = (char) => alphabet.indexOf(char.toUpperCase());
-
     const numToChar = (num) => alphabet[num % m];
 
-    while (text.length % n !== 0) text += "X"; 
+    let filteredText = text.replace(/[^A-Za-z]/g, "").toUpperCase();
+    while (filteredText.length % n !== 0) {
+      filteredText += "X";  
+    }
 
-    const textBlocks = text.match(new RegExp(`.{1,${n}}`, "g"));
+    const textBlocks = filteredText.match(new RegExp(`.{1,${n}}`, "g")); 
 
     let encryptedText = "";
 
     for (let block of textBlocks) {
-      let blockVector = block.split("").map((char) => charToNum(char));
+      let blockVector = block.split("").map((char) => charToNum(char));  
 
       let encryptedVector = Array(n).fill(0);
       for (let i = 0; i < n; i++) {
         for (let j = 0; j < n; j++) {
           encryptedVector[i] += matrix[i][j] * blockVector[j];
         }
-        encryptedVector[i] %= m; 
+        encryptedVector[i] %= m;  
       }
 
-      encryptedText += encryptedVector.map((num) => numToChar(num)).join("");
+      encryptedText += encryptedVector.map((num) => numToChar(num)).join(""); 
     }
 
     return encryptedText;
   };
 
+  const hillDecrypt = (text, matrix) => {
+    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const m = alphabet.length;
+    const n = matrix.length;
+
+    const charToNum = (char) => alphabet.indexOf(char.toUpperCase());
+    const numToChar = (num) => alphabet[num % m];
+
+    const inverseMatrix = modInverseMatrix(matrix, m);
+    if (!inverseMatrix) {
+      return "Không thể giải mã với ma trận khóa này.";
+    }
+
+    const textBlocks = text.match(new RegExp(`.{1,${n}}`, "g"));
+
+    let decryptedText = "";
+
+    for (let block of textBlocks) {
+      let blockVector = block.split("").map((char) => charToNum(char));
+
+      let decryptedVector = Array(n).fill(0);
+      for (let i = 0; i < n; i++) {
+        for (let j = 0; j < n; j++) {
+          decryptedVector[i] += inverseMatrix[i][j] * blockVector[j];
+        }
+        decryptedVector[i] %= m;
+      }
+
+      decryptedText += decryptedVector.map((num) => numToChar(num)).join("");
+    }
+
+    return decryptedText;
+  };
+
   const handleEncrypt = () => {
+    if (!validateInput(inputText)) {
+      setError("Vui lòng chỉ nhập các ký tự chữ cái không dấu. Không nhập khoảng cách và ký tự đặc biệt");
+      setOutputText("");
+      return;
+    }
+    setError("");
     const result = hillEncrypt(inputText, keyMatrix);
+    setOutputText(result);
+  };
+
+  const handleDecrypt = () => {
+    if (!validateInput(inputText)) {
+      setError("Vui lòng chỉ nhập các ký tự chữ cái không dấu.");
+      setOutputText("");
+      return;
+    }
+    setError("");
+    const result = hillDecrypt(inputText, keyMatrix);
     setOutputText(result);
   };
 
@@ -65,14 +154,15 @@ function MaHoaHill() {
       <h2 className="text-center mb-4">Mã Hóa Hill</h2>
 
       <div className="mb-3">
-        <h3>Bản Rõ:</h3>
-        <label>Nhập bản rõ:</label>
+        <h3>Bản Rõ hoặc Bản Mã:</h3>
+        <label>Nhập bản rõ hoặc bản mã:</label>
         <input
           type="text"
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
           className="form-control"
         />
+        {error && <p className="text-danger">{error}</p>}
       </div>
 
       <div className="mb-3">
@@ -111,10 +201,13 @@ function MaHoaHill() {
         <button onClick={handleEncrypt} className="btn btn-primary me-2">
           Mã Hóa
         </button>
+        <button onClick={handleDecrypt} className="btn btn-secondary">
+          Giải Mã
+        </button>
       </div>
 
       <div className="mb-3">
-        <h3>Bản Mã:</h3>
+        <h3>Kết Quả:</h3>
         <textarea
           readOnly
           value={outputText}

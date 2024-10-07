@@ -6,6 +6,7 @@ function MaHoaAffine() {
   const [a, setA] = useState("");
   const [b, setB] = useState("");
   const [outputText, setOutputText] = useState("");
+  const [errorMessage, setErrorMessage] = useState(""); 
 
   const affineEncrypt = (text, a, b) => {
     const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -69,14 +70,31 @@ function MaHoaAffine() {
     return decryptedText;
   };
 
+  const isValidInput = (text) => {
+    const regex = /^[a-zA-Z]+$/; 
+    return regex.test(text);
+  };
+
   const handleEncrypt = () => {
-    const result = affineEncrypt(inputText, a, b);
-    setOutputText(result);
+    if (!isValidInput(inputText)) {
+      setErrorMessage("Bản rõ không được chứa số, dấu cách hoặc ký tự đặc biệt. Vui lòng chỉ nhập chữ cái.");
+      setOutputText(""); 
+    } else {
+      setErrorMessage(""); 
+      const result = affineEncrypt(inputText, a, b);
+      setOutputText(result);
+    }
   };
 
   const handleDecrypt = () => {
-    const result = affineDecrypt(inputText, a, b);
-    setOutputText(result);
+    if (!isValidInput(inputText)) {
+      setErrorMessage("Bản rõ không được chứa số, dấu cách hoặc ký tự đặc biệt. Vui lòng chỉ nhập chữ cái.");
+      setOutputText(""); // Xóa kết quả giải mã
+    } else {
+      setErrorMessage(""); 
+      const result = affineDecrypt(inputText, a, b);
+      setOutputText(result);
+    }
   };
 
   return (
@@ -126,6 +144,8 @@ function MaHoaAffine() {
               </div>
             </div>
           </div>
+
+          {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
 
           <div className="text-center mb-4">
             <button onClick={handleEncrypt} className="btn btn-primary me-2">

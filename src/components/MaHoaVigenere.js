@@ -5,6 +5,7 @@ function MaHoaVigenere() {
   const [inputText, setInputText] = useState('');
   const [keyword, setKeyword] = useState('');
   const [outputText, setOutputText] = useState('');
+  const [errorMessage, setErrorMessage] = useState(''); 
 
   const vigenereEncrypt = (text, keyword) => {
     let encryptedText = '';
@@ -20,7 +21,7 @@ function MaHoaVigenere() {
         encryptedText += String.fromCharCode(((char.charCodeAt(0) - base + shift) % 26) + base);
         keywordIndex++;
       } else {
-        encryptedText += char; 
+        encryptedText += char;
       }
     }
 
@@ -39,23 +40,46 @@ function MaHoaVigenere() {
         const base = char.charCodeAt(0) < 97 ? 65 : 97;
         const shift = keyword.charCodeAt(keywordIndex % keyword.length) - 97;
         decryptedText += String.fromCharCode(((char.charCodeAt(0) - base - shift + 26) % 26) + base);
-        keywordIndex++; 
+        keywordIndex++;
       } else {
-        decryptedText += char; 
+        decryptedText += char;
       }
     }
 
     return decryptedText;
   };
 
+  const isValidInput = (text) => {
+    const regex = /^[a-zA-Z]+$/; 
+    return regex.test(text);
+  };
+
   const handleEncrypt = () => {
-    const result = vigenereEncrypt(inputText, keyword);
-    setOutputText(result);
+    if (!isValidInput(inputText)) {
+      setErrorMessage('Bản rõ không được chứa số, dấu cách hoặc ký tự đặc biệt. Vui lòng chỉ nhập chữ cái.');
+      setOutputText(''); 
+    } else if (!isValidInput(keyword)) {
+      setErrorMessage('Từ khóa chỉ được chứa các ký tự chữ cái.');
+      setOutputText(''); 
+    } else {
+      setErrorMessage(''); 
+      const result = vigenereEncrypt(inputText, keyword);
+      setOutputText(result);
+    }
   };
 
   const handleDecrypt = () => {
-    const result = vigenereDecrypt(inputText, keyword);
-    setOutputText(result);
+    if (!isValidInput(inputText)) {
+      setErrorMessage('Bản rõ không được chứa số, dấu cách hoặc ký tự đặc biệt. Vui lòng chỉ nhập chữ cái.');
+      setOutputText(''); 
+    } else if (!isValidInput(keyword)) {
+      setErrorMessage('Từ khóa chỉ được chứa các ký tự chữ cái.');
+      setOutputText(''); 
+    } else {
+      setErrorMessage(''); 
+      const result = vigenereDecrypt(inputText, keyword);
+      setOutputText(result);
+    }
   };
 
   return (
@@ -83,6 +107,8 @@ function MaHoaVigenere() {
               className="form-control"
             />
           </div>
+
+          {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
 
           <div className="text-center mb-4">
             <button onClick={handleEncrypt} className="btn btn-primary me-2">
