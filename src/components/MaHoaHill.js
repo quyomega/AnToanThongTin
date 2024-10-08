@@ -1,23 +1,8 @@
 import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-const modInverseMatrix = (matrix, mod) => {
-  const det = matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0];
-  const invDet = modInverse(det, mod); 
-  if (invDet === null) return null; 
-
-  const inverseMatrix = [
-    [matrix[1][1] * invDet % mod, -matrix[0][1] * invDet % mod],
-    [-matrix[1][0] * invDet % mod, matrix[0][0] * invDet % mod],
-  ];
-
-  for (let i = 0; i < 2; i++) {
-    for (let j = 0; j < 2; j++) {
-      if (inverseMatrix[i][j] < 0) inverseMatrix[i][j] += mod;
-    }
-  }
-
-  return inverseMatrix;
+const determinant = (matrix) => {
+  return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0];
 };
 
 const modInverse = (a, mod) => {
@@ -29,16 +14,46 @@ const modInverse = (a, mod) => {
   }
   return null;
 };
+// Tính ma trận nghịch đảo
+const modInverseMatrix = (matrix, mod) => {
+  const det = determinant(matrix);
+  const invDet = modInverse(det, mod);
+  if (invDet === null) return null;
+
+  const inverseMatrix = [
+    [(matrix[1][1] * invDet) % mod, (-matrix[0][1] * invDet) % mod],
+    [(-matrix[1][0] * invDet) % mod, (matrix[0][0] * invDet) % mod],
+  ];
+
+  // Đảm bảo các giá trị đều dương
+  for (let i = 0; i < 2; i++) {
+    for (let j = 0; j < 2; j++) {
+      if (inverseMatrix[i][j] < 0) inverseMatrix[i][j] += mod;
+    }
+  }
+
+  return inverseMatrix;
+};
+
+const isCoprime = (a, b) => {
+  const gcd = (x, y) => {
+    while (y) {
+      [x, y] = [y, x % y];
+    }
+    return x;
+  };
+  return gcd(a, b) === 1;
+};
 
 function MaHoaHill() {
-  const [inputText, setInputText] = useState("");
-  const [matrixSize, setMatrixSize] = useState(2); 
-  const [keyMatrix, setKeyMatrix] = useState([[11, 8], [3, 7]]); 
+  const [inputText, setInputText] = useState("delw");
+  const [matrixSize, setMatrixSize] = useState(2);
+  const [keyMatrix, setKeyMatrix] = useState([[11, 8], [3, 7]]);
   const [outputText, setOutputText] = useState("");
-  const [error, setError] = useState("");  // Thêm state để lưu lỗi
+  const [error, setError] = useState("");
 
   const handleMatrixChange = (row, col, value) => {
-    const updatedMatrix = [...keyMatrix];
+    const updatedMatrix = keyMatrix.map((r) => [...r]); 
     updatedMatrix[row][col] = parseInt(value, 10);
     setKeyMatrix(updatedMatrix);
   };
@@ -50,10 +65,9 @@ function MaHoaHill() {
   const handleMatrixSizeChange = (e) => {
     const size = parseInt(e.target.value, 10);
     setMatrixSize(size);
-    setKeyMatrix(generateEmptyMatrix(size)); 
+    setKeyMatrix(generateEmptyMatrix(size));
   };
 
-  // Hàm kiểm tra đầu vào: chỉ cho phép các ký tự chữ cái không dấu
   const validateInput = (text) => {
     const regex = /^[A-Za-z]+$/;
     return regex.test(text);
@@ -69,27 +83,23 @@ function MaHoaHill() {
 
     let filteredText = text.replace(/[^A-Za-z]/g, "").toUpperCase();
     while (filteredText.length % n !== 0) {
-      filteredText += "X";  
+      filteredText += "X"; 
     }
-
-    const textBlocks = filteredText.match(new RegExp(`.{1,${n}}`, "g")); 
+    const textBlocks = filteredText.match(new RegExp(`.{1,${n}}`, "g"));
 
     let encryptedText = "";
 
     for (let block of textBlocks) {
-      let blockVector = block.split("").map((char) => charToNum(char));  
-
+      let blockVector = block.split("").map((char) => charToNum(char));
       let encryptedVector = Array(n).fill(0);
-      for (let i = 0; i < n; i++) {
-        for (let j = 0; j < n; j++) {
-          encryptedVector[i] += matrix[i][j] * blockVector[j];
-        }
-        encryptedVector[i] %= m;  
+      for (let i = 0; i < n; i++) { 
+        encryptedVector[0] +=  (matrix[i][0] * blockVector[i])%m ;
       }
-
-      encryptedText += encryptedVector.map((num) => numToChar(num)).join(""); 
+      for (let j = 0; j < n; j++) { 
+        encryptedVector[1] +=  (matrix[j][1] * blockVector[j])%m ;
+      }
+      encryptedText += encryptedVector.map((num) => numToChar(num)).join("");
     }
-
     return encryptedText;
   };
 
@@ -100,7 +110,7 @@ function MaHoaHill() {
 
     const charToNum = (char) => alphabet.indexOf(char.toUpperCase());
     const numToChar = (num) => alphabet[num % m];
-
+    //sử dụng ma trận nghịch đảo của ma trận khóa
     const inverseMatrix = modInverseMatrix(matrix, m);
     if (!inverseMatrix) {
       return "Không thể giải mã với ma trận khóa này.";
@@ -112,15 +122,13 @@ function MaHoaHill() {
 
     for (let block of textBlocks) {
       let blockVector = block.split("").map((char) => charToNum(char));
-
       let decryptedVector = Array(n).fill(0);
-      for (let i = 0; i < n; i++) {
-        for (let j = 0; j < n; j++) {
-          decryptedVector[i] += inverseMatrix[i][j] * blockVector[j];
-        }
-        decryptedVector[i] %= m;
+      for (let i = 0; i < n; i++) { 
+        decryptedVector[0] +=  (inverseMatrix[i][0] * blockVector[i])%m ;
       }
-
+      for (let j = 0; j < n; j++) { 
+        decryptedVector[1] +=  (inverseMatrix[j][1] * blockVector[j])%m ;
+      }
       decryptedText += decryptedVector.map((num) => numToChar(num)).join("");
     }
 
@@ -133,6 +141,14 @@ function MaHoaHill() {
       setOutputText("");
       return;
     }
+
+    const det = determinant(keyMatrix);
+    if (!isCoprime(det, 26)) {
+      setError("Định thức của ma trận khóa phải là số nguyên tố cùng nhau với 26.");
+      setOutputText("");
+      return;
+    }
+
     setError("");
     const result = hillEncrypt(inputText, keyMatrix);
     setOutputText(result);
@@ -144,6 +160,14 @@ function MaHoaHill() {
       setOutputText("");
       return;
     }
+
+    const inverseMatrix = modInverseMatrix(keyMatrix, 26);
+    if (!inverseMatrix) {
+      setError("Ma trận khóa không có nghịch đảo, không thể giải mã.");
+      setOutputText("");
+      return;
+    }
+
     setError("");
     const result = hillDecrypt(inputText, keyMatrix);
     setOutputText(result);
@@ -206,15 +230,12 @@ function MaHoaHill() {
         </button>
       </div>
 
-      <div className="mb-3">
-        <h3>Kết Quả:</h3>
-        <textarea
-          readOnly
-          value={outputText}
-          className="form-control"
-          rows="4"
-        />
-      </div>
+      {outputText && (
+        <div>
+          <h3>Kết Quả:</h3>
+          <p>{outputText}</p>
+        </div>
+      )}
     </div>
   );
 }

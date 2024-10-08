@@ -21,7 +21,7 @@ function MaHoaAffine() {
     };
 
     if (gcd(a, m) !== 1) {
-      return "a và b phải là 2 số nguyên tố cùng nhau";
+      return null;  // Trả về null nếu a và m không nguyên tố cùng nhau
     }
 
     let encryptedText = "";
@@ -82,7 +82,12 @@ function MaHoaAffine() {
     } else {
       setErrorMessage(""); 
       const result = affineEncrypt(inputText, a, b);
-      setOutputText(result);
+      if (result === null) {
+        setErrorMessage("a và b phải là 2 số nguyên tố cùng nhau.");
+        setOutputText(""); // Xóa kết quả nếu không mã hóa được
+      } else {
+        setOutputText(result);
+      }
     }
   };
 
@@ -93,7 +98,12 @@ function MaHoaAffine() {
     } else {
       setErrorMessage(""); 
       const result = affineDecrypt(inputText, a, b);
-      setOutputText(result);
+      if (result === null) {
+        setErrorMessage("a và b phải là 2 số nguyên tố cùng nhau.");
+        setOutputText(""); // Xóa kết quả nếu không giải mã được
+      } else {
+        setOutputText(result);
+      }
     }
   };
 
