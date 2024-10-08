@@ -46,14 +46,17 @@ const isCoprime = (a, b) => {
 };
 
 function MaHoaHill() {
-  const [inputText, setInputText] = useState("delw");
+  const [inputText, setInputText] = useState("july");
   const [matrixSize, setMatrixSize] = useState(2);
-  const [keyMatrix, setKeyMatrix] = useState([[11, 8], [3, 7]]);
+  const [keyMatrix, setKeyMatrix] = useState([
+    [11, 8],
+    [3, 7],
+  ]);
   const [outputText, setOutputText] = useState("");
   const [error, setError] = useState("");
 
   const handleMatrixChange = (row, col, value) => {
-    const updatedMatrix = keyMatrix.map((r) => [...r]); 
+    const updatedMatrix = keyMatrix.map((r) => [...r]);
     updatedMatrix[row][col] = parseInt(value, 10);
     setKeyMatrix(updatedMatrix);
   };
@@ -83,7 +86,7 @@ function MaHoaHill() {
 
     let filteredText = text.replace(/[^A-Za-z]/g, "").toUpperCase();
     while (filteredText.length % n !== 0) {
-      filteredText += "X"; 
+      filteredText += "X";
     }
     const textBlocks = filteredText.match(new RegExp(`.{1,${n}}`, "g"));
 
@@ -92,11 +95,11 @@ function MaHoaHill() {
     for (let block of textBlocks) {
       let blockVector = block.split("").map((char) => charToNum(char));
       let encryptedVector = Array(n).fill(0);
-      for (let i = 0; i < n; i++) { 
-        encryptedVector[0] +=  (matrix[i][0] * blockVector[i])%m ;
+      for (let i = 0; i < n; i++) {
+        encryptedVector[0] += (matrix[i][0] * blockVector[i]) % m;
       }
-      for (let j = 0; j < n; j++) { 
-        encryptedVector[1] +=  (matrix[j][1] * blockVector[j])%m ;
+      for (let j = 0; j < n; j++) {
+        encryptedVector[1] += (matrix[j][1] * blockVector[j]) % m;
       }
       encryptedText += encryptedVector.map((num) => numToChar(num)).join("");
     }
@@ -123,11 +126,11 @@ function MaHoaHill() {
     for (let block of textBlocks) {
       let blockVector = block.split("").map((char) => charToNum(char));
       let decryptedVector = Array(n).fill(0);
-      for (let i = 0; i < n; i++) { 
-        decryptedVector[0] +=  (inverseMatrix[i][0] * blockVector[i])%m ;
+      for (let i = 0; i < n; i++) {
+        decryptedVector[0] += (inverseMatrix[i][0] * blockVector[i]) % m;
       }
-      for (let j = 0; j < n; j++) { 
-        decryptedVector[1] +=  (inverseMatrix[j][1] * blockVector[j])%m ;
+      for (let j = 0; j < n; j++) {
+        decryptedVector[1] += (inverseMatrix[j][1] * blockVector[j]) % m;
       }
       decryptedText += decryptedVector.map((num) => numToChar(num)).join("");
     }
@@ -137,14 +140,18 @@ function MaHoaHill() {
 
   const handleEncrypt = () => {
     if (!validateInput(inputText)) {
-      setError("Vui lòng chỉ nhập các ký tự chữ cái không dấu. Không nhập khoảng cách và ký tự đặc biệt");
+      setError(
+        "Vui lòng chỉ nhập các ký tự chữ cái không dấu. Không nhập khoảng cách và ký tự đặc biệt"
+      );
       setOutputText("");
       return;
     }
 
     const det = determinant(keyMatrix);
     if (!isCoprime(det, 26)) {
-      setError("Định thức của ma trận khóa phải là số nguyên tố cùng nhau với 26.");
+      setError(
+        "Định thức của ma trận khóa phải là số nguyên tố cùng nhau với 26."
+      );
       setOutputText("");
       return;
     }
@@ -210,8 +217,12 @@ function MaHoaHill() {
               <div className="col" key={colIndex}>
                 <input
                   type="number"
-                  value={keyMatrix[rowIndex] ? keyMatrix[rowIndex][colIndex] : ""}
-                  onChange={(e) => handleMatrixChange(rowIndex, colIndex, e.target.value)}
+                  value={
+                    keyMatrix[rowIndex] ? keyMatrix[rowIndex][colIndex] : ""
+                  }
+                  onChange={(e) =>
+                    handleMatrixChange(rowIndex, colIndex, e.target.value)
+                  }
                   className="form-control"
                   placeholder={`M[${rowIndex + 1}][${colIndex + 1}]`}
                 />
