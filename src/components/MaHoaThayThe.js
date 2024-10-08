@@ -6,6 +6,7 @@ function MaHoaThayThe() {
   const [Khoa, setKhoa] = useState('QWERTYUIOPASDFGHJKLZXCVBNM');
   const [outputText, setOutputText] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [inputErrorMessage, setInputErrorMessage] = useState(''); // Thêm trạng thái cho lỗi nhập bản rõ
 
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
@@ -56,6 +57,18 @@ function MaHoaThayThe() {
     }
   };
 
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    const regex = /^[a-zA-Z]+$/;
+
+    if (value === '' || regex.test(value)) {
+      setInputText(value.toUpperCase());
+      setInputErrorMessage('');
+    } else {
+      setInputErrorMessage('Chỉ được nhập chữ cái không dấu.');
+    }
+  };
+
   return (
     <div className="container mt-5 p-4 shadow rounded bg-light">
       <h2 className="text-center mb-4">Mã Hóa Thay Thế</h2>
@@ -67,9 +80,12 @@ function MaHoaThayThe() {
             <input
               type="text"
               value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
+              onChange={handleInputChange}
               className="form-control"
             />
+            {inputErrorMessage && (
+              <p className="text-danger">{inputErrorMessage}</p>
+            )}
           </div>
 
           <div className="mb-3">
@@ -90,10 +106,10 @@ function MaHoaThayThe() {
           )}
 
           <div className="text-center mb-4">
-            <button onClick={handleEncrypt} className="btn btn-primary me-2">
+            <button onClick={handleEncrypt} className="btn btn-primary me-2" disabled={inputErrorMessage}>
               Mã Hóa
             </button>
-            <button onClick={handleDecrypt} className="btn btn-secondary">
+            <button onClick={handleDecrypt} className="btn btn-secondary" disabled={inputErrorMessage}>
               Giải Mã
             </button>
           </div>

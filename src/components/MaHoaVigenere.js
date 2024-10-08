@@ -5,7 +5,7 @@ function MaHoaVigenere() {
   const [inputText, setInputText] = useState('');
   const [keyword, setKeyword] = useState('');
   const [outputText, setOutputText] = useState('');
-  const [errorMessage, setErrorMessage] = useState(''); 
+  const [errorMessage, setErrorMessage] = useState('');
 
   const vigenereEncrypt = (text, keyword) => {
     let encryptedText = '';
@@ -50,19 +50,19 @@ function MaHoaVigenere() {
   };
 
   const isValidInput = (text) => {
-    const regex = /^[a-zA-Z]+$/; 
+    const regex = /^[a-zA-Z]+$/;
     return regex.test(text);
   };
 
   const handleEncrypt = () => {
     if (!isValidInput(inputText)) {
-      setErrorMessage('Bản rõ không được chứa số, dấu cách hoặc ký tự đặc biệt. Vui lòng chỉ nhập chữ cái.');
-      setOutputText(''); 
+      setErrorMessage('Bản rõ chỉ được chứa các ký tự chữ cái.');
+      setOutputText('');
     } else if (!isValidInput(keyword)) {
       setErrorMessage('Từ khóa chỉ được chứa các ký tự chữ cái.');
-      setOutputText(''); 
+      setOutputText('');
     } else {
-      setErrorMessage(''); 
+      setErrorMessage('');
       const result = vigenereEncrypt(inputText, keyword);
       setOutputText(result);
     }
@@ -70,13 +70,13 @@ function MaHoaVigenere() {
 
   const handleDecrypt = () => {
     if (!isValidInput(inputText)) {
-      setErrorMessage('Bản rõ không được chứa số, dấu cách hoặc ký tự đặc biệt. Vui lòng chỉ nhập chữ cái.');
-      setOutputText(''); 
+      setErrorMessage('Bản rõ chỉ được chứa các ký tự chữ cái.');
+      setOutputText('');
     } else if (!isValidInput(keyword)) {
       setErrorMessage('Từ khóa chỉ được chứa các ký tự chữ cái.');
-      setOutputText(''); 
+      setOutputText('');
     } else {
-      setErrorMessage(''); 
+      setErrorMessage('');
       const result = vigenereDecrypt(inputText, keyword);
       setOutputText(result);
     }

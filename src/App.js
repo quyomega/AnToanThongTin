@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
 import MaHoaCaesar from "./components/MaHoaCaesar";
 import MaHoaThayThe from "./components/MaHoaThayThe";
@@ -7,10 +7,17 @@ import MaHoaVigenere from "./components/MaHoaVigenere";
 import MaHoaAffine from "./components/MaHoaAffine";
 import MaHoaHill from "./components/MaHoaHill";
 import MaHoaPlayFair from "./components/MaHoaPlayFair";
+import './styles.css'; // Nhập tệp CSS của bạn
 
 function App() {
+  const [showModal, setShowModal] = useState(false); 
+
   const showMessage = () => {
-    alert("Cảm ơn cô và các bạn đã theo dõi");
+    setShowModal(true); 
+  };
+
+  const handleClose = () => {
+    setShowModal(false); 
   };
 
   return (
@@ -58,7 +65,7 @@ function App() {
             </div>
             <div className="col-md-3">
               <button onClick={showMessage} className="btn btn-primary w-100">
-                Lời cảm ơn
+                Ấn vào và
               </button>
             </div>
           </div>
@@ -73,6 +80,25 @@ function App() {
           <Route path="/mahoahill" element={<MaHoaHill />} />
           <Route path="/mahoaplayfair" element={<MaHoaPlayFair />} />
         </Routes>
+
+        <div className={`modal-overlay ${showModal ? "active" : ""}`}></div> {/* Lớp làm mờ */}
+        
+        <div className={`modal fade ${showModal ? "show" : ""}`} style={{ display: showModal ? "block" : "none" }} aria-hidden={!showModal}>
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Nhóm 4 hiện lên nói</h5>
+                <button type="button" className="btn-close" onClick={handleClose}></button>
+              </div>
+              <div className="modal-body">
+                <p>Cảm ơn cô và các bạn đã theo dõi !!!</p>
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-success w-100" onClick={handleClose}>Đóng</button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </Router>
   );

@@ -5,6 +5,7 @@ function MaHoaCaesar() {
   const [inputText, setInputText] = useState('');
   const [k, setk] = useState(0);
   const [outputText, setOutputText] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const caesar = (text, k, decode = false) => {
     if (decode) {
@@ -33,6 +34,18 @@ function MaHoaCaesar() {
     setOutputText(result);
   };
 
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    const regex = /^[a-zA-Z]+$/;
+
+    if (value === '' || regex.test(value)) {
+      setInputText(value);
+      setErrorMessage('');
+    } else {
+      setErrorMessage('Chỉ được nhập chữ cái không dấu.');
+    }
+  };
+
   return (
     <div className="container mt-5 p-4 shadow rounded bg-light">
       <h2 className="text-center mb-4">Mã Hóa Caesar</h2>
@@ -44,9 +57,10 @@ function MaHoaCaesar() {
             <input
               type="text"
               value={inputText} 
-              onChange={(e) => setInputText(e.target.value)}
+              onChange={handleInputChange}
               className="form-control"
             />
+            {errorMessage && <p className="text-danger">{errorMessage}</p>}
           </div>
 
           <div className="mb-3">
@@ -60,10 +74,10 @@ function MaHoaCaesar() {
           </div>
 
           <div className="text-center mb-4">
-            <button onClick={maHoa} className="btn btn-primary me-2">
+            <button onClick={maHoa} className="btn btn-primary me-2" disabled={errorMessage}>
               Mã Hóa
             </button>
-            <button onClick={giaiMa} className="btn btn-secondary">
+            <button onClick={giaiMa} className="btn btn-secondary" disabled={errorMessage}>
               Giải Mã
             </button>
           </div>

@@ -6,7 +6,7 @@ function MaHoaAffine() {
   const [a, setA] = useState("");
   const [b, setB] = useState("");
   const [outputText, setOutputText] = useState("");
-  const [errorMessage, setErrorMessage] = useState(""); 
+  const [errorMessage, setErrorMessage] = useState("");
 
   const affineEncrypt = (text, a, b) => {
     const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -71,7 +71,7 @@ function MaHoaAffine() {
   };
 
   const isValidInput = (text) => {
-    const regex = /^[a-zA-Z]+$/; 
+    const regex = /^[a-zA-Z]+$/;
     return regex.test(text);
   };
 
@@ -80,11 +80,11 @@ function MaHoaAffine() {
       setErrorMessage("Bản rõ không được chứa số, dấu cách hoặc ký tự đặc biệt. Vui lòng chỉ nhập chữ cái.");
       setOutputText(""); 
     } else {
-      setErrorMessage(""); 
+      setErrorMessage("");
       const result = affineEncrypt(inputText, a, b);
       if (result === null) {
         setErrorMessage("a và b phải là 2 số nguyên tố cùng nhau.");
-        setOutputText(""); // Xóa kết quả nếu không mã hóa được
+        setOutputText(""); 
       } else {
         setOutputText(result);
       }
@@ -94,16 +94,26 @@ function MaHoaAffine() {
   const handleDecrypt = () => {
     if (!isValidInput(inputText)) {
       setErrorMessage("Bản rõ không được chứa số, dấu cách hoặc ký tự đặc biệt. Vui lòng chỉ nhập chữ cái.");
-      setOutputText(""); // Xóa kết quả giải mã
+      setOutputText("");
     } else {
-      setErrorMessage(""); 
+      setErrorMessage("");
       const result = affineDecrypt(inputText, a, b);
       if (result === null) {
         setErrorMessage("a và b phải là 2 số nguyên tố cùng nhau.");
-        setOutputText(""); // Xóa kết quả nếu không giải mã được
+        setOutputText(""); 
       } else {
         setOutputText(result);
       }
+    }
+  };
+
+  const handleKeyPress = (event) => {
+    const charCode = event.charCode;
+    if (!(charCode >= 65 && charCode <= 90) && !(charCode >= 97 && charCode <= 122)) {
+      event.preventDefault();
+      setErrorMessage("Chỉ được nhập chữ cái. Không nhập số, dấu cách hoặc ký tự đặc biệt.");
+    } else {
+      setErrorMessage(""); 
     }
   };
 
@@ -119,6 +129,7 @@ function MaHoaAffine() {
               type="text"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
+              onKeyPress={handleKeyPress}
               className="form-control"
             />
           </div>
