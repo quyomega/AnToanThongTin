@@ -2,7 +2,18 @@ import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const determinant = (matrix) => {
-  return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0];
+  if (matrix.length === 2) {
+    // Định thức cho ma trận 2x2
+    return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0];
+  } else if (matrix.length === 3) {
+    // Định thức cho ma trận 3x3
+    return (
+      matrix[0][0] * (matrix[1][1] * matrix[2][2] - matrix[1][2] * matrix[2][1]) -
+      matrix[0][1] * (matrix[1][0] * matrix[2][2] - matrix[1][2] * matrix[2][0]) +
+      matrix[0][2] * (matrix[1][0] * matrix[2][1] - matrix[1][1] * matrix[2][0])
+    );
+  }
+  return null; // Trường hợp ma trận không hợp lệ
 };
 
 const modInverse = (a, mod) => {
@@ -20,20 +31,51 @@ const modInverseMatrix = (matrix, mod) => {
   const invDet = modInverse(det, mod);
   if (invDet === null) return null;
 
-  const inverseMatrix = [
-    [(matrix[1][1] * invDet) % mod, (-matrix[0][1] * invDet) % mod],
-    [(-matrix[1][0] * invDet) % mod, (matrix[0][0] * invDet) % mod],
-  ];
+  if (matrix.length === 2) {
+    // Ma trận nghịch đảo 2x2
+    const inverseMatrix = [
+      [(matrix[1][1] * invDet) % mod, (-matrix[0][1] * invDet) % mod],
+      [(-matrix[1][0] * invDet) % mod, (matrix[0][0] * invDet) % mod],
+    ];
 
-  // Đảm bảo các giá trị đều dương
-  for (let i = 0; i < 2; i++) {
-    for (let j = 0; j < 2; j++) {
-      if (inverseMatrix[i][j] < 0) inverseMatrix[i][j] += mod;
+    for (let i = 0; i < 2; i++) {
+      for (let j = 0; j < 2; j++) {
+        if (inverseMatrix[i][j] < 0) inverseMatrix[i][j] += mod;
+      }
     }
+
+    return inverseMatrix;
+  } else if (matrix.length === 3) {
+    const adjugateMatrix = [
+      [
+        (matrix[1][1] * matrix[2][2] - matrix[1][2] * matrix[2][1]) * invDet,
+        -(matrix[0][1] * matrix[2][2] - matrix[0][2] * matrix[2][1]) * invDet,
+        (matrix[0][1] * matrix[1][2] - matrix[0][2] * matrix[1][1]) * invDet,
+      ],
+      [
+        -(matrix[1][0] * matrix[2][2] - matrix[1][2] * matrix[2][0]) * invDet,
+        (matrix[0][0] * matrix[2][2] - matrix[0][2] * matrix[2][0]) * invDet,
+        -(matrix[0][0] * matrix[1][2] - matrix[0][2] * matrix[1][0]) * invDet,
+      ],
+      [
+        (matrix[1][0] * matrix[2][1] - matrix[1][1] * matrix[2][0]) * invDet,
+        -(matrix[0][0] * matrix[2][1] - matrix[0][1] * matrix[2][0]) * invDet,
+        (matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0]) * invDet,
+      ],
+    ];
+
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        adjugateMatrix[i][j] = ((adjugateMatrix[i][j] % mod) + mod) % mod;
+      }
+    }
+
+    return adjugateMatrix;
   }
 
-  return inverseMatrix;
+  return null; // Trường hợp ma trận không hợp lệ
 };
+
 
 const isCoprime = (a, b) => {
   const gcd = (x, y) => {
@@ -94,12 +136,13 @@ function MaHoaHill() {
 
     for (let block of textBlocks) {
       let blockVector = block.split("").map((char) => charToNum(char));
+      console.log(blockVector)
       let encryptedVector = Array(n).fill(0);
       for (let i = 0; i < n; i++) {
-        encryptedVector[0] += (matrix[i][0] * blockVector[i]) % m;
-      }
-      for (let j = 0; j < n; j++) {
-        encryptedVector[1] += (matrix[j][1] * blockVector[j]) % m;
+        for (let j = 0; j < n; j++) {
+          encryptedVector[i] += (matrix[j][i] * blockVector[j]);
+        }
+        encryptedVector[i] = encryptedVector[i] % m; // Lấy modulo sau khi tính tổng
       }
       encryptedText += encryptedVector.map((num) => numToChar(num)).join("");
     }
@@ -126,12 +169,12 @@ function MaHoaHill() {
     for (let block of textBlocks) {
       let blockVector = block.split("").map((char) => charToNum(char));
       let decryptedVector = Array(n).fill(0);
-      for (let i = 0; i < n; i++) {
-        decryptedVector[0] += (inverseMatrix[i][0] * blockVector[i]) % m;
-      }
+    for (let i = 0; i < n; i++) {
       for (let j = 0; j < n; j++) {
-        decryptedVector[1] += (inverseMatrix[j][1] * blockVector[j]) % m;
+        decryptedVector[i] += (inverseMatrix[j][i] * blockVector[j]) ;
       }
+      decryptedVector[i] = decryptedVector[i] % m; // Lấy modulo sau khi tính tổng
+    }
       decryptedText += decryptedVector.map((num) => numToChar(num)).join("");
     }
 
