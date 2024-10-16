@@ -23,7 +23,7 @@ function App() {
   return (
     <Router>
       <div className="container mt-5">
-        <h1 className="text-center">Hệ Thống Mã Hóa</h1>
+        <h1  className="text-center" >Hệ Thống Mã Hóa</h1>
         <nav className="text-center mb-4">
           <div className="row">
             <div className="col-md-3">

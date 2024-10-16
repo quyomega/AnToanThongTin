@@ -25,7 +25,7 @@ function MaHoaVigenere() {
       }
     }
 
-    return encryptedText;
+    return encryptedText.toUpperCase();
   };
 
   const vigenereDecrypt = (text, keyword) => {
@@ -46,12 +46,22 @@ function MaHoaVigenere() {
       }
     }
 
-    return decryptedText;
+    return decryptedText.toUpperCase();
   };
 
   const isValidInput = (text) => {
     const regex = /^[a-zA-Z]+$/;
     return regex.test(text);
+  };
+
+  const handleKeyPress = (event) => {
+    const charCode = event.charCode;
+    if (!(charCode >= 65 && charCode <= 90) && !(charCode >= 97 && charCode <= 122)) {
+      event.preventDefault();
+      setErrorMessage('Chỉ được nhập chữ cái. Không nhập số, dấu cách hoặc ký tự đặc biệt.');
+    } else {
+      setErrorMessage('');
+    }
   };
 
   const handleEncrypt = () => {
@@ -94,6 +104,7 @@ function MaHoaVigenere() {
               type="text"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
+              onKeyPress={handleKeyPress}
               className="form-control"
             />
           </div>
@@ -104,6 +115,7 @@ function MaHoaVigenere() {
               type="text"
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
+              onKeyPress={handleKeyPress}
               className="form-control"
             />
           </div>
