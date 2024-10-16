@@ -6,6 +6,7 @@ function MaHoaCaesar() {
   const [k, setk] = useState(0);
   const [outputText, setOutputText] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [kErrorMessage, setkErrorMessage] = useState('');
 
   const caesar = (text, k, decode = false) => {
     if (decode) {
@@ -46,6 +47,16 @@ function MaHoaCaesar() {
     }
   };
 
+  const handlekChange = (e) => {
+    const value = parseInt(e.target.value);
+    if (value < 0 || value >= 26 || isNaN(value)) {
+      setkErrorMessage('Giá trị khóa k phải nằm trong khoảng từ 0 đến 25.');
+    } else {
+      setkErrorMessage('');
+      setk(value);
+    }
+  };
+
   return (
     <div className="container mt-5 p-4 shadow rounded bg-light">
       <h2 className="text-center mb-4">Mã Hóa Caesar</h2>
@@ -68,16 +79,25 @@ function MaHoaCaesar() {
             <input
               type="number"
               value={k}
-              onChange={(e) => setk(e.target.value)}
+              onChange={handlekChange}
               className="form-control"
+              min="0" 
+              max="25"
             />
+            {kErrorMessage && <p className="text-danger">{kErrorMessage}</p>}
           </div>
 
           <div className="text-center mb-4">
-            <button onClick={maHoa} className="btn btn-primary me-2" disabled={errorMessage}>
+            <button 
+              onClick={maHoa} 
+              className="btn btn-primary me-2" 
+              disabled={errorMessage || kErrorMessage}>
               Mã Hóa
             </button>
-            <button onClick={giaiMa} className="btn btn-secondary" disabled={errorMessage}>
+            <button 
+              onClick={giaiMa} 
+              className="btn btn-secondary" 
+              disabled={errorMessage || kErrorMessage}>
               Giải Mã
             </button>
           </div>
