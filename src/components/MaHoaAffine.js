@@ -8,21 +8,11 @@ function MaHoaAffine() {
   const [outputText, setOutputText] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
+  const validAValues = [1, 3, 5, 7, 9, 11, 15, 17, 19, 21, 23, 25]; // Các giá trị hợp lệ của a
+
   const affineEncrypt = (text, a, b) => {
     const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     const m = alphabet.length;
-    const gcd = (x, y) => {
-      while (y !== 0) {
-        const temp = y;
-        y = x % y;
-        x = temp;
-      }
-      return x;
-    };
-
-    if (gcd(a, m) !== 1) {
-      return null;  // Trả về null nếu a và m không nguyên tố cùng nhau
-    }
 
     let encryptedText = "";
 
@@ -75,19 +65,23 @@ function MaHoaAffine() {
     return regex.test(text);
   };
 
+  const isValidA = (a) => validAValues.includes(a);
+  const isValidB = (b) => b >= 0 && b <= 25; // Kiểm tra b trong khoảng 0 - 25
+
   const handleEncrypt = () => {
     if (!isValidInput(inputText)) {
       setErrorMessage("Bản rõ không được chứa số, dấu cách hoặc ký tự đặc biệt. Vui lòng chỉ nhập chữ cái.");
-      setOutputText(""); 
+      setOutputText("");
+    } else if (!isValidA(a)) {
+      setErrorMessage("Giá trị a không hợp lệ. Chọn a là 1, 3, 5, 7, 9, 11, 15, 17, 19, 21, 23 hoặc 25.");
+      setOutputText("");
+    } else if (!isValidB(b)) {
+      setErrorMessage("Giá trị b phải nằm trong khoảng từ 0 đến 25.");
+      setOutputText("");
     } else {
       setErrorMessage("");
       const result = affineEncrypt(inputText, a, b);
-      if (result === null) {
-        setErrorMessage("a và b phải là 2 số nguyên tố cùng nhau.");
-        setOutputText(""); 
-      } else {
-        setOutputText(result);
-      }
+      setOutputText(result);
     }
   };
 
@@ -95,15 +89,16 @@ function MaHoaAffine() {
     if (!isValidInput(inputText)) {
       setErrorMessage("Bản rõ không được chứa số, dấu cách hoặc ký tự đặc biệt. Vui lòng chỉ nhập chữ cái.");
       setOutputText("");
+    } else if (!isValidA(a)) {
+      setErrorMessage("Giá trị a không hợp lệ. Chọn a là 1, 3, 5, 7, 9, 11, 15, 17, 19, 21, 23 hoặc 25.");
+      setOutputText("");
+    } else if (!isValidB(b)) {
+      setErrorMessage("Giá trị b phải nằm trong khoảng từ 0 đến 25.");
+      setOutputText("");
     } else {
       setErrorMessage("");
       const result = affineDecrypt(inputText, a, b);
-      if (result === null) {
-        setErrorMessage("a và b phải là 2 số nguyên tố cùng nhau.");
-        setOutputText(""); 
-      } else {
-        setOutputText(result);
-      }
+      setOutputText(result);
     }
   };
 
@@ -113,7 +108,7 @@ function MaHoaAffine() {
       event.preventDefault();
       setErrorMessage("Chỉ được nhập chữ cái. Không nhập số, dấu cách hoặc ký tự đặc biệt.");
     } else {
-      setErrorMessage(""); 
+      setErrorMessage("");
     }
   };
 
@@ -158,6 +153,8 @@ function MaHoaAffine() {
                 <input
                   id="b"
                   type="number"
+                  min="0"
+                  max="25" // Giới hạn giá trị b
                   value={b}
                   onChange={(e) => setB(parseInt(e.target.value, 10))}
                   className="form-control"
