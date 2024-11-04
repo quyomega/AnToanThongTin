@@ -69,11 +69,10 @@ const modInverseMatrix = (matrix, mod) => {
         adjugateMatrix[i][j] = ((adjugateMatrix[i][j] % mod) + mod) % mod;
       }
     }
-
     return adjugateMatrix;
   }
 
-  return null; // Trường hợp ma trận không hợp lệ
+  return null;
 };
 
 
@@ -136,7 +135,7 @@ function MaHoaHill() {
 
     for (let block of textBlocks) {
       let blockVector = block.split("").map((char) => charToNum(char));
-      console.log(blockVector)
+      // console.log(blockVector)
       let encryptedVector = Array(n).fill(0);
       for (let i = 0; i < n; i++) {
         for (let j = 0; j < n; j++) {

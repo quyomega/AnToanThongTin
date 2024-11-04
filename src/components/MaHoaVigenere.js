@@ -6,7 +6,7 @@ function MaHoaVigenere() {
   const [keyword, setKeyword] = useState('');
   const [outputText, setOutputText] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-
+//hàm mã hóa
   const vigenereEncrypt = (text, keyword) => {
     let encryptedText = '';
     keyword = keyword.toLowerCase();
@@ -14,7 +14,6 @@ function MaHoaVigenere() {
 
     for (let i = 0; i < text.length; i++) {
       let char = text[i];
-
       if (/[a-zA-Z]/.test(char)) {
         const base = char.charCodeAt(0) < 97 ? 65 : 97;
         const shift = keyword.charCodeAt(keywordIndex % keyword.length) - 97;
