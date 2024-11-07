@@ -1,43 +1,66 @@
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function MaHoaRSA() {
   const [inputText, setInputText] = useState('');
-  const [outputText, setOutputText] = useState('');
+  const [signedText, setSignedText] = useState('');
+  const [verifiedText, setVerifiedText] = useState('');
+  const [inputVerificationText, setInputVerificationText] = useState('');
   const [p, setP] = useState(0);
   const [q, setQ] = useState(0);
   const [e, setE] = useState(0);
   const [publicKey, setPublicKey] = useState({ e: 0, n: 0 });
   const [privateKey, setPrivateKey] = useState({ d: 0, n: 0 });
   const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+  const [showSign, setShowSign] = useState(false);
+  const [showVerify, setShowVerify] = useState(false);
 
   const isPrime = (num) => {
-    if (num < 2) return false; 
+    if (num < 2) return false;
     for (let i = 2; i <= Math.sqrt(num); i++) {
       if (num % i === 0) return false;
     }
     return true;
   };
 
+  const generateRandomPrime = () => {
+    let prime = Math.floor(Math.random() * 100) + 2;
+    while (!isPrime(prime)) {
+      prime = Math.floor(Math.random() * 100) + 2;
+    }
+    return prime;
+  };
+
   const generateKeys = () => {
-    if (!isPrime(p) || !isPrime(q)) {
+    const newP = p || generateRandomPrime();
+    const newQ = q || generateRandomPrime();
+
+    if (!isPrime(newP) || !isPrime(newQ)) {
       setErrorMessage('p và q phải là số nguyên tố.');
+      toast.error('p và q phải là số nguyên tố.');
       return;
     }
 
-    const n = p * q;
-    const phi = (p - 1) * (q - 1);
+    const n = newP * newQ;
+    const phi = (newP - 1) * (newQ - 1);
 
-    // Kiểm tra tính hợp lệ của e
-    if (gcd(e, phi) !== 1 || e <= 1 || e >= phi) {
-      setErrorMessage('Giá trị e phải là số nguyên tố và coprime với phi.');
-      return;
+    let defaultE = e || 3;
+    if (gcd(defaultE, phi) !== 1 || defaultE <= 1 || defaultE >= phi) {
+      defaultE = 5;
     }
 
-    const d = modInverse(e, phi);
+    const d = modInverse(defaultE, phi);
 
-    setPublicKey({ e, n });
+    setPublicKey({ e: defaultE, n });
     setPrivateKey({ d, n });
+    setP(newP);
+    setQ(newQ);
+    setE(defaultE);
+    setSuccessMessage('Khóa đã được tạo thành công!');
+    toast.success('Khóa đã được tạo thành công!');
     setErrorMessage('');
   };
 
@@ -65,112 +88,195 @@ function MaHoaRSA() {
     return x1;
   };
 
+  const modExp = (base, exp, mod) => {
+    let result = 1;
+    base = base % mod;
+    while (exp > 0) {
+      if (exp % 2 === 1) {
+        result = (result * base) % mod;
+      }
+      exp = Math.floor(exp / 2);
+      base = (base * base) % mod;
+    }
+    return result;
+  };
+
   const rsaEncrypt = (text, e, n) => {
     const chars = text.split('').map((char) => char.charCodeAt(0));
-    const encryptedChars = chars.map((charCode) => (Math.pow(charCode, e) % n));
+    const encryptedChars = chars.map((charCode) => {
+      if (charCode >= n) {
+        setErrorMessage('Ký tự có mã ASCII lớn hơn n không thể mã hóa!');
+        toast.error('Ký tự có mã ASCII lớn hơn n không thể mã hóa!');
+        return;
+      }
+      return modExp(charCode, e, n);
+    }).filter(Boolean);
+
     return encryptedChars.join(' ');
   };
 
   const rsaDecrypt = (encryptedText, d, n) => {
     const encryptedChars = encryptedText.split(' ').map((num) => parseInt(num));
-    const decryptedChars = encryptedChars.map((charCode) => String.fromCharCode(Math.pow(charCode, d) % n));
+    const decryptedChars = encryptedChars.map((charCode) => {
+      const decryptedChar = modExp(charCode, d, n);
+      if (decryptedChar < 32 || decryptedChar > 126) {
+        setErrorMessage('Kết quả giải mã không hợp lệ (ký tự không hợp lệ).');
+        toast.error('Kết quả giải mã không hợp lệ (ký tự không hợp lệ).');
+        return;
+      }
+      return String.fromCharCode(decryptedChar);
+    });
     return decryptedChars.join('');
   };
 
-  const handleEncrypt = () => {
+  const handleSign = () => {
     if (!inputText) {
-      setErrorMessage('Vui lòng nhập văn bản để mã hóa.');
+      setErrorMessage('Vui lòng nhập văn bản để ký.');
+      toast.error('Vui lòng nhập văn bản để ký.');
       return;
     }
     setErrorMessage('');
-    const normalizedInputText = inputText.toLowerCase(); // Chuyển đổi thành chữ thường
-    const encrypted = rsaEncrypt(normalizedInputText, publicKey.e, publicKey.n);
-    setOutputText(encrypted);
+    const signed = rsaEncrypt(inputText, publicKey.e, publicKey.n);
+    setSignedText(signed);
+    toast.success('Đã ký thành công!');
   };
 
-  const handleDecrypt = () => {
-    if (!outputText) {
-      setErrorMessage('Vui lòng mã hóa văn bản trước khi giải mã.');
+  const handleVerify = () => {
+    if (!inputVerificationText) {
+      setErrorMessage('Vui lòng nhập văn bản cần xác thực.');
+      toast.error('Vui lòng nhập văn bản cần xác thực.');
       return;
     }
     setErrorMessage('');
-    const decrypted = rsaDecrypt(outputText, privateKey.d, privateKey.n);
-    setInputText(decrypted); // Cập nhật văn bản đã giải mã vào inputText
+    const verified = rsaDecrypt(inputVerificationText, privateKey.d, privateKey.n);
+    setVerifiedText(verified);
+    toast.success('Xác thực thành công!');
   };
 
   return (
     <div className="container mt-5 p-4 shadow rounded bg-light">
-      <h2 className="text-center mb-4">Mã Hóa RSA</h2>
+      <h2 className="text-center mb-4">Mã Hóa RSA (Ký và Xác Thực)</h2>
 
       <div className="mb-4">
-        <h3>Nhập p:</h3>
-        <input
-          type="number"
-          onChange={(e) => setP(Number(e.target.value))}
-          className="form-control"
-        />
-      </div>
-
-      <div className="mb-4">
-        <h3>Nhập q:</h3>
-        <input
-          type="number"
-          onChange={(e) => setQ(Number(e.target.value))}
-          className="form-control"
-        />
-      </div>
-
-      <div className="mb-4">
-        <h3>Nhập e (khóa công khai):</h3>
-        <input
-          type="number"
-          value={e}
-          onChange={(e) => setE(Number(e.target.value))}
-          className="form-control"
-        />
-      </div>
-
-      <div className="text-center mb-4">
-        <button onClick={generateKeys} className="btn btn-success">
-          Tạo Khóa
+        <button onClick={generateKeys} className="btn btn-success mb-3">
+          Sinh Khóa
         </button>
         {errorMessage && <p className="text-danger">{errorMessage}</p>}
+        {successMessage && <p className="text-success">{successMessage}</p>}
         <div className="mt-3">
           <p>Khóa công khai (e, n): ({publicKey.e.toString()}, {publicKey.n.toString()})</p>
           <p>Khóa riêng tư (d, n): ({privateKey.d.toString()}, {privateKey.n.toString()})</p>
         </div>
       </div>
 
-      <div className="row">
-        <div className="col-md-6">
-          <h3>Văn Bản:</h3>
-          <textarea
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            className="form-control"
-            rows="8"
-          />
-        </div>
-        
-        <div className="col-md-6">
-          <h3>Bản Mã:</h3>
-          <textarea
-            readOnly
-            value={outputText}
-            className="form-control"
-            rows="8"
-          />
-        </div>
+      <div className="mb-4">
+        <label htmlFor="inputP" className="form-label">Nhập giá trị p:</label>
+        <input
+          type="number"
+          id="inputP"
+          className="form-control"
+          value={p}
+          onChange={(e) => setP(Number(e.target.value))}
+        />
+        <label htmlFor="inputQ" className="form-label">Nhập giá trị q:</label>
+        <input
+          type="number"
+          id="inputQ"
+          className="form-control"
+          value={q}
+          onChange={(e) => setQ(Number(e.target.value))}
+        />
+        <label htmlFor="inputE" className="form-label">Nhập giá trị e:</label>
+        <input
+          type="number"
+          id="inputE"
+          className="form-control"
+          value={e}
+          onChange={(e) => setE(Number(e.target.value))}
+        />
       </div>
 
-      <div className="text-center mt-4">
-        <button onClick={handleEncrypt} className="btn btn-primary me-2">
-          Mã Hóa
+      <div className="mb-4">
+        <button
+          onClick={() => {
+            setShowSign(true);
+            setShowVerify(false);
+          }}
+          className="btn btn-primary"
+        >
+          Ký Văn Bản
         </button>
-        <button onClick={handleDecrypt} className="btn btn-secondary">
-          Giải Mã
+        <button
+          onClick={() => {
+            setShowVerify(true);
+            setShowSign(false);
+          }}
+          className="btn btn-secondary ml-3 ms-3"
+        >
+          Xác Thực Văn Bản
         </button>
       </div>
+
+      {showSign && (
+        <div>
+          <div className="mb-4">
+            <label htmlFor="inputText" className="form-label">Nhập Văn Bản Cần Ký:</label>
+            <textarea
+              id="inputText"
+              className="form-control"
+              rows="3"
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+            />
+          </div>
+          <button onClick={handleSign} className="btn btn-warning">
+            Ký
+          </button>
+          {signedText && (
+            <div className="mt-3">
+              <label htmlFor="signedText" className="form-label">Văn bản đã ký:</label>
+              <textarea
+                id="signedText"
+                className="form-control text-dark"
+                rows="3"
+                readOnly
+                value={signedText}
+              />
+            </div>
+          )}
+        </div>
+      )}
+
+        {showVerify && (
+          <div>
+            <div className="mb-4">
+              <label htmlFor="inputVerificationText" className="form-label">Nhập Văn Bản Cần Xác Thực:</label>
+              <textarea
+                id="inputVerificationText"
+                className="form-control"
+                rows="3"
+                value={inputVerificationText}
+                onChange={(e) => setInputVerificationText(e.target.value)}
+              />
+            </div>
+            <button onClick={handleVerify} className="btn btn-warning">
+              Xác Thực
+            </button>
+            {verifiedText && (
+              <div className="mt-3">
+                <label htmlFor="verifiedText" className="form-label">Văn bản xác thực:</label>
+                <textarea
+                  id="verifiedText"
+                  className="form-control text-dark"
+                  rows="3"
+                  readOnly
+                  value={verifiedText}
+                />
+              </div>
+            )}
+          </div>
+        )}
+      <ToastContainer />
     </div>
   );
 }
