@@ -71,7 +71,7 @@ function App() {
             </div>
             <div className="col-md-2">
               <Link to="/mahoadh" className="btn btn-primary w-100">
-                Bài 9: Mã Hóa Define Hecman
+                Bài 9: Mã Hóa Diffie Hellman
               </Link>
             </div>
             <div className="col-md-2">

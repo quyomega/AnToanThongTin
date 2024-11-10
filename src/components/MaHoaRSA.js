@@ -33,7 +33,7 @@ function MaHoaRSA() {
     }
     return prime;
   };
-
+  //sinh khóa
   const generateKeys = () => {
     const newP = p || generateRandomPrime();
     const newQ = q || generateRandomPrime();
@@ -166,7 +166,7 @@ function MaHoaRSA() {
 
   return (
     <div className="container mt-5 p-4 shadow rounded bg-light">
-      <h2 className="text-center mb-4">Mã Hóa RSA (Ký và Xác Thực)</h2>
+      <h2 className="text-center mb-4">Mã Hóa RSA</h2>
 
       <div className="mb-4">
         <button onClick={generateKeys} className="btn btn-success mb-3">
