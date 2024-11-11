@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { debounce } from 'lodash';
 
 function MaHoaRSA() {
   const [inputText, setInputText] = useState('');
@@ -11,6 +12,7 @@ function MaHoaRSA() {
   const [p, setP] = useState(0);
   const [q, setQ] = useState(0);
   const [e, setE] = useState(0);
+  const [pendingE, setPendingE] = useState(0); // Giá trị tạm thời của e
   const [publicKey, setPublicKey] = useState({ e: 0, n: 0 });
   const [privateKey, setPrivateKey] = useState({ d: 0, n: 0 });
   const [errorMessage, setErrorMessage] = useState('');
@@ -18,6 +20,20 @@ function MaHoaRSA() {
   const [showSign, setShowSign] = useState(false);
   const [showVerify, setShowVerify] = useState(false);
 
+  // Hàm debounce cập nhật e sau 1 giây
+  const updateE = useCallback(
+    debounce((value) => {
+      setE(value);
+    }, 1000),
+    []
+  );
+
+  const handleEChange = (value) => {
+    setPendingE(value);
+    updateE(value);
+  };
+
+  // Kiểm tra số nguyên tố
   const isPrime = (num) => {
     if (num < 2) return false;
     for (let i = 2; i <= Math.sqrt(num); i++) {
@@ -26,6 +42,7 @@ function MaHoaRSA() {
     return true;
   };
 
+  // Sinh số nguyên tố ngẫu nhiên
   const generateRandomPrime = () => {
     let prime = Math.floor(Math.random() * 100) + 2;
     while (!isPrime(prime)) {
@@ -33,7 +50,8 @@ function MaHoaRSA() {
     }
     return prime;
   };
-  //sinh khóa
+
+  // Sinh khóa
   const generateKeys = () => {
     const newP = p || generateRandomPrime();
     const newQ = q || generateRandomPrime();
@@ -52,7 +70,6 @@ function MaHoaRSA() {
     // Kiểm tra nếu gcd(e, phi) không phải là 1 hoặc e không hợp lệ
     if (gcd(defaultE, phi) !== 1 || defaultE <= 1 || defaultE >= phi) {
       defaultE = 13;
-      // Thông báo người dùng nếu giá trị e không hợp lệ
       setErrorMessage(`e không hợp lệ. Đã tự động chọn e = ${defaultE}`);
       toast.error(`e không hợp lệ. Đã tự động chọn e = ${defaultE}`);
     }
@@ -67,7 +84,6 @@ function MaHoaRSA() {
     toast.success('Khóa đã được tạo thành công!');
     setErrorMessage('');
   };
-  
 
   const gcd = (a, b) => {
     while (b !== 0) {
@@ -158,12 +174,6 @@ function MaHoaRSA() {
     toast.success('Xác thực thành công!');
   };
 
-  useEffect(() => {
-    if (p && q && e) {  // Kiểm tra nếu p, q và e đều có giá trị
-      generateKeys();
-    }
-  }, [p, q, e]); // Gọi lại generateKeys mỗi khi p, q, hoặc e thay đổi
-
   return (
     <div className="container mt-5 p-4 shadow rounded bg-light">
       <h2 className="text-center mb-4">Mã Hóa RSA</h2>
@@ -202,8 +212,8 @@ function MaHoaRSA() {
           type="number"
           id="inputE"
           className="form-control"
-          value={e}
-          onChange={(e) => setE(Number(e.target.value))}
+          value={pendingE} // Dùng giá trị tạm thời cho e
+          onChange={(e) => handleEChange(Number(e.target.value))}
         />
       </div>
 
@@ -219,48 +229,42 @@ function MaHoaRSA() {
         </button>
         <button
           onClick={() => {
-            setShowVerify(true);
             setShowSign(false);
+            setShowVerify(true);
           }}
-          className="btn btn-primary mx-2"
+          className="btn btn-secondary mx-2"
         >
-          Xác Thực Văn Bản
+          Xác Thực
         </button>
       </div>
 
       {showSign && (
         <div className="mb-4">
+          <label htmlFor="inputText" className="form-label">Văn bản cần ký:</label>
           <textarea
+            id="inputText"
+            className="form-control"
+            rows="3"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
-            className="form-control"
-            placeholder="Nhập văn bản để ký"
           />
-          <button onClick={handleSign} className="btn btn-primary mt-3">
-            Ký
-          </button>
-          <div className="mt-3">
-            <h5>Văn bản đã ký:</h5>
-            <p>{signedText}</p>
-          </div>
+          <button onClick={handleSign} className="btn btn-success mt-2">Ký</button>
+          {signedText && <p className="mt-3">Văn bản đã ký: {signedText}</p>}
         </div>
       )}
 
       {showVerify && (
         <div className="mb-4">
+          <label htmlFor="inputVerificationText" className="form-label"></label>
           <textarea
+            id="inputVerificationText"
+            className="form-control"
+            rows="3"
             value={inputVerificationText}
             onChange={(e) => setInputVerificationText(e.target.value)}
-            className="form-control"
-            placeholder="Nhập văn bản cần xác thực"
           />
-          <button onClick={handleVerify} className="btn btn-primary mt-3">
-            Xác Thực
-          </button>
-          <div className="mt-3">
-            <h5>Kết quả xác thực:</h5>
-            <p>{verifiedText}</p>
-          </div>
+          <button onClick={handleVerify} className="btn btn-secondary mt-2">Xác Thực</button>
+          {verifiedText && <p className="mt-3"> {verifiedText}</p>}
         </div>
       )}
 
